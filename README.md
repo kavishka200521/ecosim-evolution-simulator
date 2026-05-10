@@ -1,3 +1,5 @@
+Created by Kavishka Fernando as a personal bio-computing project.
+
 # EcoSphere
 
 EcoSphere is a simplified ecosystem evolution simulator inspired by evolutionary algorithms and ecological systems.
