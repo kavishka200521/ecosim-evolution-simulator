@@ -8,39 +8,45 @@ ENVIRONMENTS = {
 "Grassland": {
     "description": "Balanced open environment with moderate food and visibility.",
     "plant_growth": 1.15,
-    "prey_camouflage_bonus": 0.90,
-    "predator_speed_bonus": 1.00
+    "prey_camouflage": 0.90,
+    "predator_speed": 1.00
 },
 "Savannah": {
     "description": "Open dry grassland where speed and energy efficiency are important.",
     "plant_growth": 0.95,
-    "prey_camouflage_bonus": 1.05,
-    "predator_speed_bonus": 1.15
+    "prey_camouflage": 1.05,
+    "predator_speed": 1.15
 },
 "Forest": {
     "description": "Dense habitat where camouflage helps prey survive.",
     "plant_growth": 1.25,
-    "prey_camouflage_bonus": 1.25,
-    "predator_speed_bonus": 0.85
+    "prey_camouflage": 1.25,
+    "predator_speed": 0.85
 },
 "Desert": {
     "description": "Harsh environment with low food and high energy pressure.",
     "plant_growth": 0.65,
-    "prey_camouflage_bonus": 1.15,
-    "predator_speed_bonus": 1.05
+    "prey_camouflage": 1.15,
+    "predator_speed": 1.05
 },
 "Arctic": {
     "description": "Cold environment with slow growth and high survival pressure.",
     "plant_growth": 0.75,
-    "prey_camouflage_bonus": 1.20,
-    "predator_speed_bonus": 0.90
+    "prey_camouflage": 1.20,
+    "predator_speed": 0.90
 },
 "Wetland": {
     "description": "Resource-rich but unstable ecosystem with rapid population changes.",
     "plant_growth": 1.45,
-    "prey_camouflage_bonus": 1.00,
-    "predator_speed_bonus": 0.95
-}}
+    "prey_camouflage": 1.00,
+    "predator_speed": 0.95
+},
+"Marshland": {
+    "description": "Open environment with medium food and stable population.",
+    "plant_growth": 1.10,
+    "prey_camouflage": 1.30,
+    "predator_speed": 0.85
+},}
 
 def clamp(value, low, high):
     return max(low, min(high, value))
@@ -72,22 +78,22 @@ def prey_fitness(prey, predator, environment):
     env = ENVIRONMENTS[environment]
     survival = (
         prey["speed"] * 0.30
-        + prey["camouflage"] * env["prey_camouflage_bonus"] * 0.35
+        + prey["camouflage"] * env["prey_camouflage"] * 0.35
         + prey["energy_efficiency"] * 0.25
         + prey["reproduction"] * 0.10
     )
-    predator_pressure = predator["speed"] * env["predator_speed_bonus"] * 0.25 + predator["hunting_skill"] * 0.35
+    predator_pressure = predator["speed"] * env["predator_speed"] * 0.25 + predator["hunting_skill"] * 0.35
     return clamp(survival - predator_pressure * 0.35, 0.05, 1.0)
 
 def predator_fitness(predator, prey, environment):
     env = ENVIRONMENTS[environment]
     survival = (
         predator["hunting_skill"] * 0.38
-        + predator["speed"] * env["predator_speed_bonus"] * 0.28
+        + predator["speed"] * env["predator_speed"] * 0.28
         + predator["energy_efficiency"] * 0.22
         + predator["reproduction"] * 0.12
     )
-    prey_defence = prey["speed"] * 0.20 + prey["camouflage"] * env["prey_camouflage_bonus"] * 0.25
+    prey_defence = prey["speed"] * 0.20 + prey["camouflage"] * env["prey_camouflage"] * 0.25
     return clamp(survival - prey_defence * 0.25, 0.05, 1.0)
 
 def explain(final_state, prey_traits, predator_traits, environment):
@@ -130,8 +136,8 @@ def run_simulation(environment, generations, plants, prey_count, predator_count)
         food_factor = clamp(plants / max(1, prey_count * 3), 0.0, 1.5)
         prey_births = int(prey_count * prey_traits["reproduction"] * prey_fit * food_factor * 0.35)
 
-        hunting_pressure = predator_traits["hunting_skill"] * predator_traits["speed"] * env["predator_speed_bonus"]
-        prey_defence = prey_traits["speed"] * 0.35 + prey_traits["camouflage"] * env["prey_camouflage_bonus"] * 0.35
+        hunting_pressure = predator_traits["hunting_skill"] * predator_traits["speed"] * env["predator_speed"]
+        prey_defence = prey_traits["speed"] * 0.35 + prey_traits["camouflage"] * env["prey_camouflage"] * 0.35
         predation_rate = clamp(hunting_pressure - prey_defence * 0.45, 0.02, 0.45)
 
         prey_eaten = int(min(prey_count, predator_count * predation_rate * 1.7))
